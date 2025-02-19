@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedido de Gás a Domicílio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-container label {
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .form-container select, .form-container input, .form-container button {
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .form-container input[type="number"] {
+      width: 100px;
+      text-align: center;
+    }
+
+    .form-container button {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-container button:hover {
+      background-color: #218838;
+    }
+
+    .total {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #333;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .payment-method {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .payment-method input {
+      width: auto;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Pedido de Gás a Domicílio</h1>
+    
+    <div class="form-container">
+      <!-- Seleção do tipo de gás -->
+      <label for="gas-type">Escolha o tipo de gás:</label>
+      <select id="gas-type">
+        <option value="8kg">Gás 8kg - R$ 90,00</option>
+        <option value="13kg">Gás 13kg - R$ 120,00</option>
+        <option value="P20">Gás P20 - R$ 280,00</option>
+        <option value="P45">Gás P45 - R$ 490,00</option>
+      </select>
+
+      <!-- Seleção da quantidade -->
+      <label for="quantity">Quantidade:</label>
+      <input type="number" id="quantity" value="1" min="1" onchange="updateTotal()">
+
+      <!-- Métodos de pagamento -->
+      <label>Forma de pagamento:</label>
+      <div class="payment-method">
+        <input type="radio" id="pix" name="payment" value="PIX" checked>
+        <label for="pix">PIX</label>
+        
+        <input type="radio" id="card" name="payment" value="Cartão">
+        <label for="card">Cartão</label>
+        
+        <input type="radio" id="cash" name="payment" value="Dinheiro">
+        <label for="cash">Dinheiro</label>
+      </div>
+
+      <!-- Endereço de entrega -->
+      <label for="address">Informe o endereço de entrega:</label>
+      <input type="text" id="address" placeholder="Digite o endereço">
+
+      <!-- Total -->
+      <div class="total">
+        <p>Total: R$ <span id="total">90.00</span></p>
+      </div>
+
+      <!-- Botão de enviar pedido -->
+      <button onclick="submitOrder()">Enviar Pedido</button>
+    </div>
+  </div>
+
+  <script>
+    const prices = {
+      '8kg': 90,
+      '13kg': 120,
+      'P20': 280,
+      'P45': 490
+    };
+
+    function updateTotal() {
+      let quantity = document.getElementById('quantity').value;
+      let gasType = document.getElementById('gas-type').value;
+      let total = prices[gasType] * quantity;
+      document.getElementById('total').textContent = total.toFixed(2);
+    }
+
+    function submitOrder() {
+      let quantity = document.getElementById('quantity').value;
+      let gasType = document.getElementById('gas-type').value;
+      let total = parseFloat(document.getElementById('total').textContent);
+      let address = document.getElementById('address').value;
+      let paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+      if (!address || total <= 0) {
+        alert("Por favor, preencha todos os campos corretamente.");
+        return;
+      }
+
+      // Gerar link para o Waze com o endereço
+      let wazeLink = `https://waze.com/ul?ll=${encodeURIComponent(address)}&navigate=yes`;
+
+      // Montar a mensagem do WhatsApp
+      let message = `Pedido de Gás a Domicílio:\n\n` +
+                    `Tipo de Gás: ${gasType}\n` +
+                    `Quantidade: ${quantity}\n` +
+                    `Total: R$ ${total.toFixed(2)}\n` +
+                    `Método de Pagamento: ${paymentMethod}\n` +
+                    `Endereço: ${address}\n` +
+                    `Para visualizar a rota no Waze, clique aqui: ${wazeLink}`;
+
+      // Número do telefone do vendedor
+      let phoneNumber = "55999999999";
+
+      // Enviar a mensagem via WhatsApp
+      let whatsAppLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsAppLink, "_blank");
+    }
+  </script>
+
+</body>
+</html>
